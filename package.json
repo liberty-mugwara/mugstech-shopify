@@ -1,0 +1,24 @@
+{
+  "name": "mugstech-shopify",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "version": "1.0.0",
+  "description": "Shopify GraphQL API helpers",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.build.json --declaration",
+    "prepare": "npm run build",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "keywords": [],
+  "author": "Liberty Mugwara",
+  "license": "ISC",
+  "dependencies": {
+    "graphql-request": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/concat-stream": "^2.0.0",
+    "typescript": "^4.8.4"
+  }
+}
