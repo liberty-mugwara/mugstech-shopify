@@ -176,18 +176,19 @@ export async function updateTags(id: string, ...newTags: string[]) {
     { input: { id, tags: finalTags } }
   );
 
-  if (res.orderUpdate.order) return true;
-  return false;
+  const returnVal = { orderId: id, tagged: false };
+  if (res.orderUpdate.order) returnVal.tagged = true;
+  return returnVal;
 }
 
 export async function updateTagsForMultipleOrders(
-  orders: { orderId: string }[],
+  orderIds: string[],
   ...newTags: string[]
 ) {
-  const req = async (order: { orderId: string }) => {
-    return await updateTags(order.orderId, ...newTags);
+  const req = async (orderId: string) => {
+    return await updateTags(orderId, ...newTags);
   };
-  const res = await throttle(req, orders, 1, 0);
+  const res = await throttle(req, orderIds, 1, 0);
   return getThrottleResValues(res);
 }
 
