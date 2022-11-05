@@ -2,7 +2,7 @@ import { GraphQLClient } from "graphql-request";
 import { RawTaxOrder } from "./types";
 
 export const graphqlClient = new GraphQLClient(
-  `https://${process.env.SHOPIFY_PASSWORD}:${process.env.SHOPIFY_USERNAME}/admin/api/2021-07/graphql.json`,
+  `https://${process.env.SHOPIFY_PASSWORD}:${process.env.SHOPIFY_USERNAME}/admin/api/${process.env.SHOPIFY_API_VERSION}/graphql.json`,
   {
     headers: {
       "Content-Type": "application/json",
@@ -30,14 +30,14 @@ export async function getOrders<TOderParams>({
       };
     } = await graphqlClient.request(
       `{
-              orders(first: ${limit},query: ${query}) {
-                edges {
-                  node {
-                    id
-                  }
-                }
+          orders(first: ${limit},query: "${query}") {
+            edges {
+              node {
+                id
               }
-            }`
+            }
+          }
+        }`
     );
 
     const orderQueue = res1.orders.edges.map(({ node }) => ({
