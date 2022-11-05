@@ -10,6 +10,58 @@ export const graphqlClient = new GraphQLClient(
   }
 );
 
+export async function getProductIdFromVariantId(variantId: string | number) {
+  try {
+    const res: {
+      productVariant: {
+        product: {
+          id: string;
+        };
+      };
+    } = await graphqlClient.request(
+      `
+      {
+        productVariant(id: "gid://shopify/ProductVariant/${variantId}") {
+          product {
+            id
+          }
+        }
+      }
+    `
+    );
+
+    const map: Record<string | number, string> = {};
+    map[variantId] = res.productVariant.product.id;
+    return map;
+  } catch (e) {
+    throw e;
+  }
+}
+
+export async function getProductIdsFromVariantIds(
+  variantIds: (string | number)[]
+) {
+  try {
+    const resultMap: Record<string | number, string> = {};
+    const res2 = await throttle(
+      getProductIdFromVariantId,
+      variantIds,
+      100,
+      1500
+    );
+
+    getThrottleResValues(res2).forEach((idsMap) => {
+      Object.entries(idsMap).forEach(([key, val]) => {
+        resultMap[key] = val;
+      });
+    });
+
+    return resultMap;
+  } catch (e) {
+    throw e;
+  }
+}
+
 export async function getOrders<TOderParams>({
   query,
   orderParams,
