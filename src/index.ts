@@ -63,7 +63,7 @@ export async function getProductIdsFromVariantIds(
       `;
 
       const res2: Record<string, { product: { id: string } }> | undefined =
-        await exports.graphqlClient.request(query).catch((e: Error) => {
+        await graphqlClient.request(query).catch((e: Error) => {
           failuresCounts++;
           console.error(e);
         });
