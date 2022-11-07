@@ -1,16 +1,8 @@
-import { GraphQLClient } from "graphql-request";
 import { RawTaxOrder } from "./types";
+import { graphqlClient } from "./api";
+import { setTimeout } from "timers/promises";
 
-export const graphqlClient = new GraphQLClient(
-  `https://${process.env.SHOPIFY_PASSWORD}:${process.env.SHOPIFY_USERNAME}/admin/api/${process.env.SHOPIFY_API_VERSION}/graphql.json`,
-  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-export async function getProductIdFromVariantId(variantId: string | number) {
+export async function getProductIdsFromVariantIds(variantId: string | number) {
   try {
     const res: {
       productVariant: {
@@ -33,30 +25,6 @@ export async function getProductIdFromVariantId(variantId: string | number) {
     const map: Record<string | number, string> = {};
     map[variantId] = res.productVariant.product.id;
     return map;
-  } catch (e) {
-    throw e;
-  }
-}
-
-export async function getProductIdsFromVariantIds(
-  variantIds: (string | number)[]
-) {
-  try {
-    const resultMap: Record<string | number, string> = {};
-    const res2 = await throttle(
-      getProductIdFromVariantId,
-      variantIds,
-      100,
-      1500
-    );
-
-    getThrottleResValues(res2).forEach((idsMap) => {
-      Object.entries(idsMap).forEach(([key, val]) => {
-        resultMap[key] = val;
-      });
-    });
-
-    return resultMap;
   } catch (e) {
     throw e;
   }
@@ -275,9 +243,7 @@ export async function throttle<TInput, TReqReturn>(
 
     if (wait === 0) continue;
 
-    await new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), wait);
-    });
+    await setTimeout(wait);
   }
 
   return results;

@@ -2,7 +2,7 @@
   "name": "mugstech-shopify",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Shopify GraphQL API helpers",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,6 +15,7 @@
   "author": "Liberty Mugwara",
   "license": "ISC",
   "dependencies": {
+    "form-data": "^4.0.0",
     "graphql-request": "^5.0.0"
   },
   "devDependencies": {
