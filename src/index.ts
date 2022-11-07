@@ -2,7 +2,7 @@ import { RawTaxOrder } from "./types";
 import { graphqlClient } from "./api";
 import { setTimeout } from "timers/promises";
 
-export async function getProductIdsFromVariantIds(variantId: string | number) {
+export async function getProductIdFromVariantId(variantId: string | number) {
   try {
     const res: {
       productVariant: {
@@ -25,6 +25,60 @@ export async function getProductIdsFromVariantIds(variantId: string | number) {
     const map: Record<string | number, string> = {};
     map[variantId] = res.productVariant.product.id;
     return map;
+  } catch (e) {
+    throw e;
+  }
+}
+
+export async function getProductIdsFromVariantIds(
+  variantIds: (string | number)[],
+  limit = 4,
+  wait = 14000
+) {
+  try {
+    const reqInput = [...variantIds];
+    const results: Record<string, string> = {};
+    let failuresCounts = 0;
+
+    while (reqInput.length) {
+      const tempInput = [];
+
+      while (tempInput.length < limit + 1 && reqInput.length) {
+        const val = reqInput.pop();
+        if (val) tempInput.push(val);
+      }
+
+      const createQuery = (id: string | number) => `
+        _${id}: productVariant(id: "gid://shopify/ProductVariant/${id}") {
+          product {
+            id
+          }
+        }
+      `;
+
+      const query = `
+        {
+          ${tempInput.map((id) => createQuery(id)).join(" ")}
+        }
+      `;
+
+      const res2: Record<string, { product: { id: string } }> | undefined =
+        await exports.graphqlClient.request(query).catch((e: Error) => {
+          failuresCounts++;
+          console.error(e);
+        });
+
+      if (res2) {
+        for (const [vId, value] of Object.entries(res2)) {
+          results[vId.replace("_", "")] = value.product.id;
+        }
+      }
+
+      if (wait === 0) continue;
+      await setTimeout(wait);
+    }
+    console.log({ failuresCounts });
+    return results;
   } catch (e) {
     throw e;
   }
