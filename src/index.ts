@@ -70,7 +70,11 @@ export async function getProductIdsFromVariantIds(
 
       if (res2) {
         for (const [vId, value] of Object.entries(res2)) {
-          results[vId.replace("_", "")] = value.product.id;
+          if (vId && value) {
+            results[vId.replace("_", "")] = value.product.id;
+          } else {
+            console.log(vId, value);
+          }
         }
       }
 
