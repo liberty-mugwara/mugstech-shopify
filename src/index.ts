@@ -32,8 +32,8 @@ export async function getProductIdFromVariantId(variantId: string | number) {
 
 export async function getProductIdsFromVariantIds(
   variantIds: (string | number)[],
-  limit = 4,
-  wait = 14000
+  limit = 475,
+  wait = 20000
 ) {
   try {
     const reqInput = [...variantIds];
