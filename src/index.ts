@@ -2,6 +2,8 @@ import { RawTaxOrder } from "./types";
 import { graphqlClient } from "./api";
 import { setTimeout } from "timers/promises";
 
+export * from "./utils";
+
 export async function getProductIdFromVariantId(variantId: string | number) {
   try {
     const res: {
