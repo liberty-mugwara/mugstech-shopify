@@ -17,10 +17,12 @@
   "dependencies": {
     "form-data": "^4.0.0",
     "graphql-request": "^5.0.0",
-    "tslib": "^2.4.1"
+    "tslib": "^2.4.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@types/concat-stream": "^2.0.0",
+    "@types/xml2js": "^0.4.11",
     "typescript": "^4.8.4"
   }
 }
