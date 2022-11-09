@@ -1,5 +1,26 @@
-import { graphqlClient } from "./api";
+import { gql, graphqlClient } from "./api";
+
+import { bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
+
+export const updateProductTagsMutation = gql`
+  mutation productUpdate($input: ProductInput!) {
+    productUpdate(input: $input) {
+      product {
+        id
+        tags
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export function bulkUpdateProductsTags(JSONLReadStream: NodeJS.ReadableStream) {
+  return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
+}
 
 export async function getProductIdFromVariantId(variantId: string | number) {
   try {
