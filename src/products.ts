@@ -18,7 +18,9 @@ export const updateProductTagsMutation = gql`
   }
 `;
 
-export function bulkUpdateProductsTags(JSONLReadStream: NodeJS.ReadableStream) {
+export async function bulkUpdateProductsTags(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
   return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
 }
 

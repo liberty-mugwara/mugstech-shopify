@@ -5,7 +5,7 @@ import concat from "concat-stream";
 import { parseString } from "xml2js";
 import { pipeline } from "node:stream";
 
-type TBulkOperationStatus =
+export type TBulkOperationStatus =
   | "CANCELED"
   | "CANCELING"
   | "COMPLETED"
@@ -14,7 +14,7 @@ type TBulkOperationStatus =
   | "FAILED"
   | "RUNNING";
 
-interface IBulkOperationRunMutationResponse {
+export interface IBulkOperationRunMutationResponse {
   bulkOperationRunMutation: {
     bulkOperation: { status: TBulkOperationStatus };
   };
