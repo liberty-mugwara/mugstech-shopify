@@ -3,7 +3,8 @@ import { gql, graphqlClient } from "./api";
 import FormData from "form-data";
 import concat from "concat-stream";
 import { parseString } from "xml2js";
-import { pipeline } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { promisify } from "node:util";
 
 export type TBulkOperationStatus =
   | "CANCELED"
@@ -27,60 +28,66 @@ export async function bulkUpdate({
   JSONLReadStream: NodeJS.ReadableStream;
   mutation: string;
 }) {
-  const JSONLUploadOptions = await generateJSONLUploadOptions();
+  try {
+    const JSONLUploadOptions = await generateJSONLUploadOptions();
 
-  const form = new FormData();
-
-  JSONLUploadOptions.parameters.forEach(({ name, value }) => {
-    form.append(name, value);
-  });
-
-  form.append("file", JSONLReadStream);
-
-  const { PostResponse: uploadRes } = await new Promise<{
-    PostResponse: { Key: string[] };
-  }>((resolve, reject) => {
-    form.submit(JSONLUploadOptions.url, function (err, res) {
-      if (err) reject(err);
-
-      pipeline(
-        res,
-        concat((data) => {
-          parseString(data, function (err, result) {
-            if (err) return reject(err);
-            resolve(result);
-          });
-        })
-      );
+    const form = new FormData();
+    JSONLUploadOptions.parameters.forEach(({ name, value }) => {
+      form.append(name, value);
     });
-  });
 
-  // make bulk request
-  const bulkRequestResponse: IBulkOperationRunMutationResponse =
-    await graphqlClient.request(
-      `
-           mutation {
-             bulkOperationRunMutation(
-               mutation: "${mutation}",
-               stagedUploadPath: "${uploadRes.Key[0]}"
-             ) {
-               bulkOperation {
-                 id
-                 url
-                 status
-               }
-               userErrors {
-                 message
-                 field
-               }
-             }
-           }
-         `
+    form.append("file", JSONLReadStream);
+
+    const submitForm = promisify(form.submit.bind(form));
+
+    const resStream = await submitForm(JSONLUploadOptions.url);
+
+    let uploadResMessage: { PostResponse: { Key: string[] } } | undefined;
+
+    await pipeline(
+      resStream as any as NodeJS.ReadableStream,
+      concat((data) => {
+        parseString(data, function (err, result) {
+          if (err) throw err;
+          uploadResMessage = result;
+        });
+      })
     );
 
-  // console.log(bulkRequestResponse);
+    if (uploadResMessage?.PostResponse) {
+      console.log(uploadResMessage);
+      // make bulk request
+      const bulkRequestResponse: IBulkOperationRunMutationResponse =
+        await graphqlClient.request(
+          `
+             mutation {
+               bulkOperationRunMutation(
+                 mutation: "${mutation}",
+                 stagedUploadPath: "${uploadResMessage.PostResponse.Key[0]}"
+               ) {
+                 bulkOperation {
+                   id
+                   url
+                   status
+                 }
+                 userErrors {
+                   message
+                   field
+                 }
+               }
+             }
+           `
+        );
 
-  return bulkRequestResponse;
+      // console.log(bulkRequestResponse);
+
+      return bulkRequestResponse;
+    } else {
+      throw new Error("JSONL Upload Failed");
+    }
+  } catch (e) {
+    throw e;
+  }
 }
 
 export async function generateJSONLUploadOptions(): Promise<{
