@@ -14,7 +14,7 @@ interface IFormartArgs {
 export function formartId({ id, type }: IFormartArgs) {
   const base = "gid://shopify";
   const map: Record<TShopifyIdTypes, string> = {
-    PRODUCT_ID: `${base}/Product/`,
+    PRODUCT_ID: `${base}/Product`,
     PRODUCT_VARIANT_ID: `${base}/ProductVariant`,
     INVENTORY_ITEM: `${base}/InventoryItem`,
     LOCATION: `${base}/Location`,
