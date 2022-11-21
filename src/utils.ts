@@ -50,11 +50,6 @@ export async function throttle<TInput, TReqReturn>(
   return results;
 }
 
-/** - date must be an ISO string */
-export function convertISODateToEDIDate(date: string) {
-  return date.split("T")[0].split("-").join("");
-}
-
 export function getThrottleResValues<T>(res: PromiseSettledResult<T>[]) {
   return getFulfilledResults(res).map(({ value }) => value);
 }
@@ -63,4 +58,10 @@ export function getFulfilledResults<T>(res: PromiseSettledResult<T>[]) {
   return res.filter(
     ({ status }) => status === "fulfilled"
   ) as PromiseFulfilledResult<T>[];
+}
+
+export function getShopifyDate(daysFromToday = 0) {
+  const today = new Date();
+  const date = new Date(new Date().setDate(today.getDate() + daysFromToday));
+  return date.toISOString().split("T")[0];
 }

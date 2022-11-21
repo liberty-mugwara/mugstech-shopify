@@ -15,10 +15,42 @@ export type TBulkOperationStatus =
   | "FAILED"
   | "RUNNING";
 
+export interface IBulkOperation {
+  status: TBulkOperationStatus;
+  id: string;
+  url: string | null;
+}
+
 export interface IBulkOperationRunMutationResponse {
   bulkOperationRunMutation: {
-    bulkOperation: { status: TBulkOperationStatus };
+    bulkOperation: IBulkOperation;
   };
+}
+
+export interface IBulkOperationRunQueryResponse {
+  bulkOperationRunQuery: {
+    bulkOperation: IBulkOperation;
+  };
+}
+
+export async function bulkQuery(query: string) {
+  const mutation = gql`
+    mutation bulkOperationRunQuery($query: String!) {
+      bulkOperationRunQuery(query: $query) {
+        bulkOperation {
+          id
+          url
+          status
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  return graphqlClient.request(mutation, { query });
 }
 
 export async function bulkUpdate({
@@ -132,10 +164,18 @@ export async function generateJSONLUploadOptions(): Promise<{
 }
 
 export async function getBulkUpdateStatus() {
+  return getBulkOperationStatus("MUTATION");
+}
+
+export async function getBulkQueryStatus() {
+  return getBulkOperationStatus("QUERY");
+}
+
+export async function getBulkOperationStatus(type: "MUTATION" | "QUERY") {
   try {
     const query = gql`
       query {
-        currentBulkOperation(type: MUTATION) {
+        currentBulkOperation(type: ${type}) {
           id
           status
           errorCode
