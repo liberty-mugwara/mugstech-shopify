@@ -2,7 +2,7 @@
   "name": "mugstech-shopify",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Shopify GraphQL API helpers",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
