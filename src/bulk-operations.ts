@@ -19,6 +19,12 @@ export interface IBulkOperation {
   status: TBulkOperationStatus;
   id: string;
   url: string | null;
+  errorCode: number;
+  objectCount: number;
+}
+
+export interface ICurrentBulkOperation {
+  currentBulkOperation: IBulkOperation;
 }
 
 export interface IBulkOperationRunMutationResponse {
@@ -185,11 +191,11 @@ export async function getBulkOperationStatus(type: "MUTATION" | "QUERY") {
       }
     `;
 
-    const res: { currentBulkOperation: { status: TBulkOperationStatus } } =
-      await graphqlClient.request(query);
+    const res: ICurrentBulkOperation = await graphqlClient.request(query);
 
     const BusyStates = ["RUNNING", "CREATED", "CANCELING"];
-    return { status: res.currentBulkOperation.status, BusyStates };
+
+    return { ...res.currentBulkOperation, BusyStates };
   } catch (error) {
     throw error;
   }
