@@ -2,6 +2,7 @@ import { gql, graphqlClient } from "./api";
 
 import { bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
+import { IProductCreateInput } from "./types";
 
 export const updateProductTagsMutation = gql`
   mutation productUpdate($input: ProductInput!) {
@@ -108,4 +109,22 @@ export async function getProductIdsFromVariantIds(
   } catch (e) {
     throw e;
   }
+}
+
+export async function createProduct(input: IProductCreateInput) {
+  const mutation = gql`
+    mutation productCreate($input: ProductInput!) {
+      productCreate(input: $input) {
+        product {
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  return await graphqlClient.request(mutation, input);
 }
