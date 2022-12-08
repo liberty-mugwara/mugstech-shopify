@@ -192,12 +192,14 @@ export async function waitForBulkQueryToComplete(interval = 30000) {
 export async function bulkQueryComplete({
   query,
   lineByLine,
+  pollInterval = 20000,
 }: {
   query: string;
   lineByLine?: boolean;
+  pollInterval?: number;
 }) {
   try {
-    await waitForBulkQueryToComplete();
+    await waitForBulkQueryToComplete(pollInterval);
 
     const res = await bulkQuery(query);
 
@@ -212,7 +214,7 @@ export async function bulkQueryComplete({
       );
     }
 
-    const finishedBulkState = await waitForBulkQueryToComplete();
+    const finishedBulkState = await waitForBulkQueryToComplete(pollInterval);
 
     if (!finishedBulkState.url) throw new Error("No url, check your query");
 
@@ -227,7 +229,7 @@ export async function bulkQueryComplete({
         crlfDelay: Infinity,
       });
 
-      return rl;
+      return rl as readline.ReadLine;
     }
 
     return response.body as NodeJS.ReadableStream;

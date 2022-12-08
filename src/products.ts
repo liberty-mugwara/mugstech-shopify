@@ -4,6 +4,7 @@ import { bulkQueryComplete, bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
 import { IProductCreateInput } from "./types";
 import { pipeline } from "node:stream/promises";
+import readline from "readline";
 
 export const updateProductTagsMutation = gql`
   mutation productUpdate($input: ProductInput!) {
@@ -177,12 +178,13 @@ export async function getAllProductIds(
   await pipeline(readStream, writeStream);
 }
 
-export async function getAllProductVariantIds(
-  writeStream:
-    | NodeJS.WriteStream
-    | NodeJS.ReadWriteStream
-    | NodeJS.WritableStream
-) {
+export async function getAllProductVariantIds({
+  lineByLine = false,
+  pollInterval = 10000,
+}: {
+  lineByLine?: boolean;
+  pollInterval?: number;
+}) {
   const query = `
   query {
     productVariants {
@@ -198,6 +200,6 @@ export async function getAllProductVariantIds(
     }
   }
   `;
-  const readStream = await bulkQueryComplete({ query });
-  await pipeline(readStream, writeStream);
+
+  return await bulkQueryComplete({ query, lineByLine, pollInterval });
 }
