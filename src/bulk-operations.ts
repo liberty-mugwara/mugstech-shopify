@@ -218,22 +218,35 @@ export async function bulkQueryComplete({
 
     if (!finishedBulkState.url) throw new Error("No url, check your query");
 
-    const response = await fetch(finishedBulkState.url);
-
-    if (!response.ok)
-      throw new Error(`unexpected response ${response.statusText}`);
-
-    if (lineByLine) {
-      const rl = readline.createInterface({
-        input: response.body as NodeJS.ReadableStream,
-        crlfDelay: Infinity,
-      });
-
-      return rl as readline.ReadLine;
-    }
-
-    return response.body as NodeJS.ReadableStream;
+    return await downloadBulkJsonlFile({
+      url: finishedBulkState.url,
+      lineByLine,
+    });
   } catch (e) {
     throw e;
   }
+}
+
+export async function downloadBulkJsonlFile({
+  url,
+  lineByLine,
+}: {
+  url: string;
+  lineByLine?: boolean;
+}) {
+  const response = await fetch(url);
+
+  if (!response.ok)
+    throw new Error(`unexpected response ${response.statusText}`);
+
+  if (lineByLine) {
+    const rl = readline.createInterface({
+      input: response.body as NodeJS.ReadableStream,
+      crlfDelay: Infinity,
+    });
+
+    return rl as readline.ReadLine;
+  }
+
+  return response.body as NodeJS.ReadableStream;
 }
