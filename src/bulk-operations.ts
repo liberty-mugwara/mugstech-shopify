@@ -178,7 +178,7 @@ export async function getBulkOperationStatus(type: "MUTATION" | "QUERY") {
   }
 }
 
-async function waitForBulkQueryToComplete(interval = 30000) {
+export async function waitForBulkQueryToComplete(interval = 30000) {
   let statusData = await getBulkQueryStatus();
   if (statusData.BusyStates.includes(statusData.status)) {
     while (statusData.BusyStates.includes(statusData.status)) {
@@ -189,7 +189,7 @@ async function waitForBulkQueryToComplete(interval = 30000) {
   return statusData;
 }
 
-async function bulkQueryComplete({
+export async function bulkQueryComplete({
   query,
   lineByLine,
 }: {
