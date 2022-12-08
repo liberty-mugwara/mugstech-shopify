@@ -1,6 +1,33 @@
 // *******************************************************
 // Shopify types
 // *******************************************************
+export type TShopifyObject =
+  | "Customer"
+  | "Fulfillment"
+  | "InventoryItem"
+  | "LineItem"
+  | "Location"
+  | "Order"
+  | "OrderTransaction"
+  | "Product"
+  | "ProductVariant"
+  | "Refund"
+  | "ShippingLine";
+
+export interface IMoneyV2 {
+  amount: string;
+  currencyCode: string;
+}
+
+export interface IMoneyBag {
+  presentmentMoney: IMoneyV2;
+}
+
+export interface ITaxLine {
+  title: string;
+  rate: string;
+  priceSet: IMoneyBag;
+}
 
 export type TShopifyIdTypes =
   | "PRODUCT_ID"

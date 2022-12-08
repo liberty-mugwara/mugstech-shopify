@@ -1,26 +1,40 @@
 import { setTimeout } from "timers/promises";
+import {
+  IFormartArgs,
+  ITaxLine,
+  TShopifyIdTypes,
+  TShopifyObject,
+} from "./types";
 
-type TShopifyIdTypes =
-  | "PRODUCT_ID"
-  | "PRODUCT_VARIANT_ID"
-  | "INVENTORY_ITEM"
-  | "LOCATION";
-
-interface IFormartArgs {
-  id: number;
-  type: TShopifyIdTypes;
+export function getTotalTax(taxLines: ITaxLine[]) {
+  return taxLines.reduce(
+    (prevValue, currentValue) =>
+      prevValue + parseFloat(currentValue.priceSet.presentmentMoney.amount),
+    0
+  );
 }
 
-export function formartId({ id, type }: IFormartArgs) {
-  const base = "gid://shopify";
-  const map: Record<TShopifyIdTypes, string> = {
-    PRODUCT_ID: `${base}/Product`,
-    PRODUCT_VARIANT_ID: `${base}/ProductVariant`,
-    INVENTORY_ITEM: `${base}/InventoryItem`,
-    LOCATION: `${base}/Location`,
-  };
+export function multiplyCash(amount: string, multiplier: number) {
+  return parseFloat(
+    (
+      (parseInt(parseFloat(amount).toFixed(2).toString().replace(".", ""), 10) *
+        multiplier) /
+      100
+    ).toFixed(2)
+  );
+}
 
-  return `${map[type]}/${id}`;
+interface IObjectIdParams<T> {
+  id: T;
+  object: TShopifyObject;
+}
+
+export function getShopifyIdNumber({ id, object }: IObjectIdParams<string>) {
+  return parseInt(id.replace(`gid://shopify/${object}/`, ""), 10);
+}
+
+export function formartId({ id, object }: IObjectIdParams<number>) {
+  return `gid://shopify/${object}/${id}`;
 }
 
 export async function throttle<TInput, TReqReturn>(
