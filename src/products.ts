@@ -148,7 +148,12 @@ export async function productExists(sku: string) {
   return false;
 }
 
-export async function getAllProductIds(writeStream: NodeJS.WriteStream) {
+export async function getAllProductIds(
+  writeStream:
+    | NodeJS.WriteStream
+    | NodeJS.ReadWriteStream
+    | NodeJS.WritableStream
+) {
   const query = `
   query {
     products {
@@ -162,6 +167,31 @@ export async function getAllProductIds(writeStream: NodeJS.WriteStream) {
                 sku
               }
             }
+          }
+        }
+      }
+    }
+  }
+  `;
+  const readStream = await bulkQueryComplete({ query });
+  await pipeline(readStream, writeStream);
+}
+
+export async function getAllProductVariantIds(
+  writeStream:
+    | NodeJS.WriteStream
+    | NodeJS.ReadWriteStream
+    | NodeJS.WritableStream
+) {
+  const query = `
+  query {
+    productVariants {
+      edges {
+        node {
+          id
+          sku
+          product {
+            id
           }
         }
       }
