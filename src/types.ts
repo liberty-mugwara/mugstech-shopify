@@ -2,6 +2,17 @@
 // Shopify types
 // *******************************************************
 
+export type TShopifyIdTypes =
+  | "PRODUCT_ID"
+  | "PRODUCT_VARIANT_ID"
+  | "INVENTORY_ITEM"
+  | "LOCATION";
+
+export interface IFormartArgs {
+  id: number;
+  type: TShopifyIdTypes;
+}
+
 export interface IShopifylineItemNode {
   quantity: number;
   name: string;
@@ -135,5 +146,45 @@ export interface IProductCreateInput {
     alt: string;
     mediaContentType: string;
     originalSource: string;
+  };
+}
+
+export type TBulkOperationStatus =
+  | "CANCELED"
+  | "CANCELING"
+  | "COMPLETED"
+  | "CREATED"
+  | "EXPIRED"
+  | "FAILED"
+  | "RUNNING";
+
+export interface IBulkOperation {
+  status: TBulkOperationStatus;
+  id: string;
+  url: string | null;
+  errorCode: number;
+  objectCount: number;
+}
+
+export type TbulkOperationUserErrors = {
+  field: string[];
+  message: string;
+}[];
+
+export interface ICurrentBulkOperation {
+  currentBulkOperation: IBulkOperation;
+}
+
+export interface IBulkOperationRunMutationResponse {
+  bulkOperationRunMutation: {
+    bulkOperation: IBulkOperation | null;
+    userErrors: TbulkOperationUserErrors;
+  };
+}
+
+export interface IBulkOperationRunQueryResponse {
+  bulkOperationRunQuery: {
+    bulkOperation: IBulkOperation | null;
+    userErrors: TbulkOperationUserErrors;
   };
 }
