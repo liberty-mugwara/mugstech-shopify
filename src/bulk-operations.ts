@@ -146,7 +146,7 @@ export async function generateJSONLUploadOptions(): Promise<{
   }
 }
 
-export async function getBulkUpdateStatus() {
+export async function getBulkMutationStatus() {
   return getBulkOperationStatus("MUTATION");
 }
 
