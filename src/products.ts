@@ -156,8 +156,12 @@ export async function getAllProductIds(writeStream: NodeJS.WriteStream) {
         node {
           id
           variants(first:20){
-            id
-            sku
+            edges{
+              node{
+                id
+                sku
+              }
+            }
           }
         }
       }
