@@ -1,6 +1,6 @@
 import { gql, graphqlClient } from "./api";
 
-import { bulkQueryComplete, bulkUpdate } from "./bulk-operations";
+import { bulkQuery, bulkQueryComplete, bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
 import { IProductCreateInput } from "./types";
 import { pipeline } from "node:stream/promises";
@@ -149,42 +149,7 @@ export async function productExists(sku: string) {
   return false;
 }
 
-export async function getAllProductIds(
-  writeStream:
-    | NodeJS.WriteStream
-    | NodeJS.ReadWriteStream
-    | NodeJS.WritableStream
-) {
-  const query = `
-  query {
-    products {
-      edges {
-        node {
-          id
-          variants(first:20){
-            edges{
-              node{
-                id
-                sku
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  `;
-  const readStream = await bulkQueryComplete({ query });
-  await pipeline(readStream, writeStream);
-}
-
-export async function getAllProductVariantIds({
-  lineByLine = false,
-  pollInterval = 10000,
-}: {
-  lineByLine?: boolean;
-  pollInterval?: number;
-}) {
+export async function getAllProductVariantIds() {
   const query = `
   query {
     productVariants {
@@ -201,5 +166,5 @@ export async function getAllProductVariantIds({
   }
   `;
 
-  return await bulkQueryComplete({ query, lineByLine, pollInterval });
+  return await bulkQuery(query);
 }
