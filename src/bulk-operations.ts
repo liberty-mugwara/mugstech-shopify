@@ -1,43 +1,18 @@
 import { gql, graphqlClient } from "./api";
-
+import fetch from "node-fetch";
 import FormData from "form-data";
 import concat from "concat-stream";
 import { parseString } from "xml2js";
 import { pipeline } from "node:stream/promises";
 import { promisify } from "node:util";
-
-export type TBulkOperationStatus =
-  | "CANCELED"
-  | "CANCELING"
-  | "COMPLETED"
-  | "CREATED"
-  | "EXPIRED"
-  | "FAILED"
-  | "RUNNING";
-
-export interface IBulkOperation {
-  status: TBulkOperationStatus;
-  id: string;
-  url: string | null;
-  errorCode: number;
-  objectCount: number;
-}
-
-export interface ICurrentBulkOperation {
-  currentBulkOperation: IBulkOperation;
-}
-
-export interface IBulkOperationRunMutationResponse {
-  bulkOperationRunMutation: {
-    bulkOperation: IBulkOperation;
-  };
-}
-
-export interface IBulkOperationRunQueryResponse {
-  bulkOperationRunQuery: {
-    bulkOperation: IBulkOperation;
-  };
-}
+import readline from "readline";
+import { setTimeout } from "node:timers/promises";
+import {
+  IBulkOperationRunQueryResponse,
+  IBulkOperationRunMutationResponse,
+  ICurrentBulkOperation,
+} from "./types";
+import { BulkOperationError } from "./errors";
 
 export async function bulkQuery(query: string) {
   const mutation = gql`
@@ -56,7 +31,9 @@ export async function bulkQuery(query: string) {
     }
   `;
 
-  return graphqlClient.request(mutation, { query });
+  return graphqlClient.request(mutation, {
+    query,
+  }) as Promise<IBulkOperationRunQueryResponse>;
 }
 
 export async function bulkUpdate({
@@ -198,5 +175,63 @@ export async function getBulkOperationStatus(type: "MUTATION" | "QUERY") {
     return { ...res.currentBulkOperation, BusyStates };
   } catch (error) {
     throw error;
+  }
+}
+
+async function waitForBulkQueryToComplete(interval = 30000) {
+  let statusData = await getBulkQueryStatus();
+  if (statusData.BusyStates.includes(statusData.status)) {
+    while (statusData.BusyStates.includes(statusData.status)) {
+      await setTimeout(interval);
+      statusData = await getBulkQueryStatus();
+    }
+  }
+  return statusData;
+}
+
+async function bulkQueryComplete({
+  query,
+  lineByLine,
+}: {
+  query: string;
+  lineByLine?: boolean;
+}) {
+  try {
+    await waitForBulkQueryToComplete();
+
+    const res = await bulkQuery(query);
+
+    if (!res.bulkOperationRunQuery.bulkOperation) {
+      throw new BulkOperationError({
+        message: "Malformed query/mutation",
+        userErrors: res.bulkOperationRunQuery.userErrors,
+      });
+    } else if (res.bulkOperationRunQuery.bulkOperation.status !== "CREATED") {
+      throw new Error(
+        `The bulk operation was not created, the current status is: ${res.bulkOperationRunQuery.bulkOperation.status}`
+      );
+    }
+
+    const finishedBulkState = await waitForBulkQueryToComplete();
+
+    if (!finishedBulkState.url) throw new Error("No url, check your query");
+
+    const response = await fetch(finishedBulkState.url);
+
+    if (!response.ok)
+      throw new Error(`unexpected response ${response.statusText}`);
+
+    if (lineByLine) {
+      const rl = readline.createInterface({
+        input: response.body as NodeJS.ReadableStream,
+        crlfDelay: Infinity,
+      });
+
+      return rl;
+    }
+
+    return response.body as NodeJS.ReadableStream;
+  } catch (e) {
+    throw e;
   }
 }
