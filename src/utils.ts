@@ -37,6 +37,10 @@ export function formartId({ id, object }: IObjectIdParams<number>) {
   return `gid://shopify/${object}/${id}`;
 }
 
+export function formatIdForS3Names(id: string) {
+  return id.replaceAll("/", "-").replaceAll(":", "").replaceAll("--", "-");
+}
+
 export async function throttle<TInput, TReqReturn>(
   req: (val: TInput) => Promise<TReqReturn>,
   reqInputList: TInput[],
