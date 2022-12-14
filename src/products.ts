@@ -4,6 +4,11 @@ import { bulkQuery, bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
 import { IProductCreateInput } from "./types";
 
+export type TProductBulkMutationFns =
+  | "bulkCreateProducts"
+  | "bulkUpdateProductsTags";
+export type TProductBulkQueryFns = "getAllProductVariantIds";
+
 export const createProductMutation = gql`
   mutation productCreate($input: ProductInput!) {
     productCreate(input: $input) {
