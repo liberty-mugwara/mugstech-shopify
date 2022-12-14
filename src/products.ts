@@ -1,10 +1,36 @@
 import { gql, graphqlClient } from "./api";
 
-import { bulkQuery, bulkQueryComplete, bulkUpdate } from "./bulk-operations";
+import { bulkQuery, bulkUpdate } from "./bulk-operations";
 import { setTimeout } from "timers/promises";
 import { IProductCreateInput } from "./types";
-import { pipeline } from "node:stream/promises";
-import readline from "readline";
+
+export const createProductMutation = gql`
+  mutation productCreate($input: ProductInput!) {
+    productCreate(input: $input) {
+      product {
+        id
+        handle
+        description
+        createdAt
+        status
+        totalVariants
+        variants(first: 1) {
+          sku
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkCreateProducts(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: createProductMutation });
+}
 
 export const updateProductTagsMutation = gql`
   mutation productUpdate($input: ProductInput!) {
