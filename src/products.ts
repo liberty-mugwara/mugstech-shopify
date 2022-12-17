@@ -20,7 +20,12 @@ export const createProductMutation = gql`
         status
         totalVariants
         variants(first: 1) {
-          sku
+          edges {
+            node {
+              id
+              sku
+            }
+          }
         }
       }
       userErrors {
