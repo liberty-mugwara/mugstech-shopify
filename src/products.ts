@@ -24,6 +24,9 @@ export const createProductMutation = gql`
             node {
               id
               sku
+              inventoryItem {
+                id
+              }
             }
           }
         }
@@ -61,6 +64,40 @@ export async function bulkUpdateProductsTags(
   JSONLReadStream: NodeJS.ReadableStream
 ) {
   return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
+}
+
+export const deleteProductMutation = `
+mutation productDelete($input: ProductDeleteInput!) {
+  productDelete(input: $input) {
+    deletedProductId
+    userErrors {
+      field
+      message
+    }
+  }
+}
+`;
+
+export type TProductDeleteReturn = Promise<{
+  productDelete: {
+    deletedProductId: string | null;
+    userErrors: {
+      field: [string];
+      message: string;
+    }[];
+  };
+}>;
+
+export async function deleteProduct(id: string): TProductDeleteReturn;
+export async function deleteProduct(deleteVars: {
+  input: { id: string };
+}): TProductDeleteReturn;
+export async function deleteProduct(
+  input: string | { input: { id: string } }
+): TProductDeleteReturn {
+  const formattedInput =
+    typeof input === "string" ? { input: { id: input } } : input;
+  return await graphqlClient.request(deleteProductMutation, formattedInput);
 }
 
 export async function getProductIdFromVariantId(variantId: string | number) {
