@@ -67,6 +67,7 @@ export type TWeightUnit = "GRAMS" | "KILOGRAMS" | "OUNCES" | "POUNDS";
 
 export interface IProductCreateInput {
   input: {
+    bodyHtml: string;
     collectionsToJoin?: string[];
     collectionsToLeave?: string[];
     customProductType?: string;
