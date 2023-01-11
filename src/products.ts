@@ -7,7 +7,9 @@ import { IProductCreateInput } from "./types";
 export type TProductBulkMutationFns =
   | "bulkCreateProducts"
   | "bulkUpdateProductsTags";
-export type TProductBulkQueryFns = "getAllProductVariantIds";
+export type TProductBulkQueryFns =
+  | "getAllProductVariantIds"
+  | "getAllProductImages";
 
 export const createProductMutation = gql`
   mutation productCreate($input: ProductInput!) {
