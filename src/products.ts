@@ -66,6 +66,45 @@ export async function bulkUpdateProductsTags(
   return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
 }
 
+export const updateProductMutation = gql`
+  mutation productUpdate($input: ProductInput!) {
+    productUpdate(input: $input) {
+      product {
+        id
+        tags
+        id
+        handle
+        description
+        createdAt
+        status
+        totalVariants
+        variants(first: 1) {
+          edges {
+            node {
+              id
+              sku
+              inventoryItem {
+                id
+              }
+            }
+          }
+        }
+      }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkUpdateProducts(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: updateProductMutation });
+}
+
 export const deleteProductMutation = `
 mutation productDelete($input: ProductDeleteInput!) {
   productDelete(input: $input) {
@@ -220,6 +259,31 @@ export async function productExists(sku: string) {
   }
 
   return false;
+}
+
+export async function getAllProductImages() {
+  const query = `
+  query {
+    products {
+      edges {
+        node {
+          id
+          images {
+            edges {
+              node {
+                id
+                altText
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  return await bulkQuery(query);
 }
 
 export async function getAllProductVariantIds() {
