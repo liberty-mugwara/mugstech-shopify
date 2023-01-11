@@ -6,7 +6,8 @@
   "description": "Shopify GraphQL API helpers",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p tsconfig.build.json --declaration",
+    "cleanup": "rimraf lib || true",
+    "build": "npm run cleanup && tsc -p tsconfig.build.json --declaration",
     "prepare": "npm run build",
     "version": "git add -A src",
     "postversion": "git push && git push --tags"
