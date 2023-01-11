@@ -2,11 +2,12 @@
   "name": "mugstech-shopify",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "version": "2.13.1",
+  "version": "2.14.0",
   "description": "Shopify GraphQL API helpers",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p tsconfig.build.json --declaration",
+    "cleanup": "rimraf lib || true",
+    "build": "npm run cleanup && tsc -p tsconfig.build.json --declaration",
     "prepare": "npm run build",
     "version": "git add -A src",
     "postversion": "git push && git push --tags"
@@ -18,6 +19,7 @@
     "form-data": "^4.0.0",
     "graphql-request": "^5.0.0",
     "node-fetch": "^2.6.7",
+    "rimraf": "^3.0.2",
     "tslib": "^2.4.1",
     "xml2js": "^0.4.23"
   },

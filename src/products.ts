@@ -6,8 +6,12 @@ import { IProductCreateInput } from "./types";
 
 export type TProductBulkMutationFns =
   | "bulkCreateProducts"
+  | "bulkUpdateProductsImages"
+  | "bulkAppendProductsImages"
   | "bulkUpdateProductsTags";
-export type TProductBulkQueryFns = "getAllProductVariantIds";
+export type TProductBulkQueryFns =
+  | "getAllProductVariantIds"
+  | "getAllProductImages";
 
 export const createProductMutation = gql`
   mutation productCreate($input: ProductInput!) {
@@ -64,6 +68,99 @@ export async function bulkUpdateProductsTags(
   JSONLReadStream: NodeJS.ReadableStream
 ) {
   return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
+}
+
+export const updateProductImagesMutation = gql`
+  mutation productUpdate($input: ProductInput!) {
+    productUpdate(input: $input) {
+      product {
+        id
+        images {
+          edges {
+            node {
+              id
+              altText
+              url
+            }
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkUpdateProductsImages(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: updateProductImagesMutation });
+}
+
+export const appendProductImagesMutation = gql`
+  mutation productAppendImages($input: ProductAppendImagesInput!) {
+    productAppendImages(input: $input) {
+      newImages {
+        id
+        altText
+        url
+      }
+      product {
+        id
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkAppendProductsImages(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: appendProductImagesMutation });
+}
+
+export const updateProductMutation = gql`
+  mutation productUpdate($input: ProductInput!) {
+    productUpdate(input: $input) {
+      product {
+        id
+        tags
+        id
+        handle
+        description
+        createdAt
+        status
+        totalVariants
+        variants(first: 1) {
+          edges {
+            node {
+              id
+              sku
+              inventoryItem {
+                id
+              }
+            }
+          }
+        }
+      }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkUpdateProducts(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: updateProductMutation });
 }
 
 export const deleteProductMutation = `
@@ -220,6 +317,31 @@ export async function productExists(sku: string) {
   }
 
   return false;
+}
+
+export async function getAllProductImages() {
+  const query = `
+  query {
+    products {
+      edges {
+        node {
+          id
+          images {
+            edges {
+              node {
+                id
+                altText
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  return await bulkQuery(query);
 }
 
 export async function getAllProductVariantIds() {
