@@ -7,6 +7,7 @@ import { IProductCreateInput } from "./types";
 export type TProductBulkMutationFns =
   | "bulkCreateProducts"
   | "bulkUpdateProductsImages"
+  | "bulkAppendProductsImages"
   | "bulkUpdateProductsTags";
 export type TProductBulkQueryFns =
   | "getAllProductVariantIds"
@@ -96,6 +97,31 @@ export async function bulkUpdateProductsImages(
   JSONLReadStream: NodeJS.ReadableStream
 ) {
   return bulkUpdate({ JSONLReadStream, mutation: updateProductImagesMutation });
+}
+
+export const appendProductImagesMutation = gql`
+  mutation productAppendImages($input: ProductAppendImagesInput!) {
+    productAppendImages(input: $input) {
+      newImages {
+        id
+        altText
+        url
+      }
+      product {
+        id
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function bulkAppendProductsImages(
+  JSONLReadStream: NodeJS.ReadableStream
+) {
+  return bulkUpdate({ JSONLReadStream, mutation: appendProductImagesMutation });
 }
 
 export const updateProductMutation = gql`
