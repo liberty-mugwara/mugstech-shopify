@@ -21,7 +21,12 @@ export const setMetaFieldsMutation = gql`
 `;
 
 export async function bulkSetMetafields(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: setMetaFieldsMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: setMetaFieldsMutation,
+    fileName,
+  });
 }
