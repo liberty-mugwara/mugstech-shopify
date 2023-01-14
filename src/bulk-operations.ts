@@ -39,9 +39,11 @@ export async function bulkQuery(query: string) {
 export async function bulkUpdate({
   JSONLReadStream,
   mutation,
+  fileName,
 }: {
   JSONLReadStream: NodeJS.ReadableStream;
   mutation: string;
+  fileName: string;
 }) {
   try {
     const JSONLUploadOptions = await generateJSONLUploadOptions();
@@ -51,7 +53,7 @@ export async function bulkUpdate({
       form.append(name, value);
     });
 
-    form.append("file", JSONLReadStream);
+    form.append("file", JSONLReadStream, { filename: fileName });
 
     const submitForm = promisify(form.submit.bind(form));
 

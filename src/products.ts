@@ -44,9 +44,14 @@ export const createProductMutation = gql`
 `;
 
 export async function bulkCreateProducts(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: createProductMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: createProductMutation,
+    fileName,
+  });
 }
 
 export const updateProductTagsMutation = gql`
@@ -65,9 +70,14 @@ export const updateProductTagsMutation = gql`
 `;
 
 export async function bulkUpdateProductsTags(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: updateProductTagsMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: updateProductTagsMutation,
+    fileName,
+  });
 }
 
 export const updateProductImagesMutation = gql`
@@ -94,9 +104,14 @@ export const updateProductImagesMutation = gql`
 `;
 
 export async function bulkUpdateProductsImages(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: updateProductImagesMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: updateProductImagesMutation,
+    fileName,
+  });
 }
 
 export const appendProductImagesMutation = gql`
@@ -119,9 +134,14 @@ export const appendProductImagesMutation = gql`
 `;
 
 export async function bulkAppendProductsImages(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: appendProductImagesMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: appendProductImagesMutation,
+    fileName,
+  });
 }
 
 export const updateProductMutation = gql`
@@ -158,9 +178,14 @@ export const updateProductMutation = gql`
 `;
 
 export async function bulkUpdateProducts(
-  JSONLReadStream: NodeJS.ReadableStream
+  JSONLReadStream: NodeJS.ReadableStream,
+  fileName: string
 ) {
-  return bulkUpdate({ JSONLReadStream, mutation: updateProductMutation });
+  return bulkUpdate({
+    JSONLReadStream,
+    mutation: updateProductMutation,
+    fileName,
+  });
 }
 
 export const deleteProductMutation = `
