@@ -381,6 +381,13 @@ export async function getAllProductVariantIds() {
         node {
           id
           sku
+          inventoryItem {
+            id
+          }
+          selectedOptions{
+            name
+            value
+          }
           product {
             id
           }
