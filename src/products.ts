@@ -164,6 +164,10 @@ export const updateProductMutation = gql`
               inventoryItem {
                 id
               }
+              selectedOptions{
+                name
+                value
+              }
             }
           }
         }
