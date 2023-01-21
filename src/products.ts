@@ -11,7 +11,8 @@ export type TProductBulkMutationFns =
   | "bulkUpdateProductsTags";
 export type TProductBulkQueryFns =
   | "getAllProductVariantIds"
-  | "getAllProductImages";
+  | "getAllProductImages"
+  | "getVariantsData";
 
 export const createProductMutation = gql`
   mutation productCreate($input: ProductInput!) {
@@ -390,6 +391,36 @@ export async function getAllProductVariantIds() {
           }
           product {
             id
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  return await bulkQuery(query);
+}
+
+export async function getVariantsData() {
+  const query = `
+  query {
+    productVariants {
+      edges {
+        node {
+          id
+          sku
+          title
+          inventoryItem {
+            id
+          }
+          selectedOptions{
+            name
+            value
+          }
+          product {
+            id
+            title
+            vendor
           }
         }
       }
