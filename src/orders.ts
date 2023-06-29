@@ -169,8 +169,11 @@ export async function updateTags(id: string, ...newTags: string[]) {
     { input: { id, tags: finalTags } }
   );
 
-  const returnVal = { orderId: id, tagged: false };
-  if (res.orderUpdate.order) returnVal.tagged = true;
+  const returnVal = { orderId: id, tagged: false, tags: existingTags };
+  if (res.orderUpdate.order) {
+    returnVal.tagged = true;
+    returnVal.tags = res.orderUpdate.order.tags;
+  }
   return returnVal;
 }
 
